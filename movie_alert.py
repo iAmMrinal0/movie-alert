@@ -1,7 +1,7 @@
 import requests
 import configobj
 from bs4 import BeautifulSoup
-# from PushBullet import PushBullet
+from PushBullet import PushBullet
 
 
 def showtimes(url):
@@ -19,10 +19,10 @@ def showtimes(url):
     for t in tag[0].find_all("div", attrs={"class": "fleft cmain"}):
         for z in t.find_all("span", attrs={"class": "mname"}):
             if config["movie_name"].lower() in z.string.lower():
-                movie = "{} ".format(z.string)
+                movie = "{0} ".format(z.string)
                 g = t.find_all("a", attrs={"class": "venclick"})
                 for k in g:
-                    show_times += "{} ".format(k.string)
+                    show_times += "{0} ".format(k.string)
     if show_times != "":
         cinema_hall = soup.title.string[:-55]
         return [cinema_hall, movie, show_times]

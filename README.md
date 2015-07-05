@@ -10,16 +10,16 @@ A script written in Python to send a PushBullet notification when a particular m
   - websocket-client - `pip install websocket-client`  
   - configobj - `pip install configobj`
 
-3. Collect your PushBullet access token from [here](https://www.pushbullet.com/#settings) and device nickname from [here](https://www.pushbullet.com/#devices)
+3. Collect your PushBullet access token from [here](https://www.pushbullet.com/#settings/account) and device nickname from [here](https://www.pushbullet.com/#devices)
 
 
 
 ## Usage
 Setup using `python setup.py` and enter your city, movie name, date and month to track, PushBullet access token and device nickname.
 
-Now run `python movie_alert.py` from project directory in command prompt. If a movie is playing in the hall on the particular date, a push notification will be sent to your device with show timings.
+Now run `python movie_alert.py` and if a movie is playing on the date and in the city you entered, a push notification will be sent to your device with show timings.
 
 ## To Do
 1. Check for a movie in a city with price range.
 2. Manage for task scheduling so it checks every x minutes till movie is found.
-3. Handle exceptions.
+3. Handle exceptions during initial setup.
