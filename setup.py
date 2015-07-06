@@ -27,6 +27,10 @@ def main():
 
     movie = input("Which movie to track? ")
     config["movie_name"] = movie
+
+    language = input("Which language should the movie be tracked in? ")
+    config["language"] = language
+
     day = input("What date(dd) do you want to track it? ")
     config["day"] = day if len(day) == 2 else "0" + day
 
