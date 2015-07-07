@@ -34,10 +34,10 @@ def main():
         month = input("Which month(mm) should the movie be tracked in? ")
         config["month"] = month
 
-    check = True
     nickname_list = []
-    while(check):
-        if not config["access_token"]:
+    if not config["access_token"]:
+        check = True
+        while(check):
             access_token = input("Enter access token: ")
             check_nick = validate(access_token)
             check = check_nick[0]
