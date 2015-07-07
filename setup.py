@@ -3,21 +3,17 @@ import requests
 from PushBullet import PushBullet
 
 
-def validate(token, nick=None):
-    if nickname is None:
-        try:
-            p = PushBullet(token)
-            devices = p.getDevices()
-            return False
-        except requests.exceptions.HTTPError:
-            return True
-    else:
+def validate(token):
+    try:
         p = PushBullet(token)
         devices = p.getDevices()
+        nick = [False]
         for dev in devices:
-            if "nickname" in dev.keys() and dev["nickname"] == nick.lower():
-                return False
-        return True
+            if "nickname" in dev.keys():
+                nick.append(dev["nickname"])
+        return nick
+    except requests.exceptions.HTTPError:
+        return [True]
 
 
 def main():
@@ -39,26 +35,32 @@ def main():
         config["month"] = month
 
     check = True
+    nickname_list = []
     while(check):
         if not config["access_token"]:
             access_token = input("Enter access token: ")
-            check = validate(access_token)
+            check_nick = validate(access_token)
+            check = check_nick[0]
             if not check:
                 config["access_token"] = access_token
+                if len(check_nick) > 1:
+                    nickname_list = check_nick[1:]
 
-    check = True
-    while(check):
-        if not config["device_nickname"]:
-            nickname = input("Nickname of device to send notification? ")
-            check = validate(access_token, nickname)
-            if not check:
-                config["device_nickname"] = nickname
-
+    if not config["device_nickname"] and nickname_list:
+        for i in range(0, len(nickname_list)):
+            print("{0}. {1}".format(i + 1, nickname_list[i]))
+        while(True):
+            nickname = input("Which device(1,{0}) would you like the "
+                             "notification sent to?".format(i + 1))
+            if int(nickname) in range(1, i + 2):
+                config["device_nickname"] = nickname_list[
+                    int(nickname) - 1]
+                break
     config.write()
 
     print("'{0}' on {1}-{2}-{3} will be tracked and will be sent to '{4}'".
-          format(config["movie_name"], config["day"],
-                 config["month"], config["year"], config["device_nickname"])
+          format(config["movie_name"], config["day"], config["month"],
+                 config["year"], config["device_nickname"])
           )
 
 if __name__ == "__main__":
