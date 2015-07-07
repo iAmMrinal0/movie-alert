@@ -58,7 +58,8 @@ def main():
             devices = p.getDevices()
             iden = ""
             for dev in devices:
-                if dev["nickname"] == config["device_nickname"]:
+                if ("nickname" in dev.keys() and
+                        dev["nickname"] == config["device_nickname"]):
                     iden = dev["iden"]
                     break
 
