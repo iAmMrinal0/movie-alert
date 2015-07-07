@@ -23,3 +23,6 @@ Now run `python movie_alert.py` and if a movie is playing on the date and in the
 1. Check for a movie in a city with price range.
 2. Manage for task scheduling so it checks every x minutes till movie is found.
 3. Handle exceptions during initial setup.
+
+### License
+ See the [LICENSE](LICENSE.md) file for license rights and limitations (GNU GPL v3)
