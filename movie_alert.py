@@ -87,4 +87,11 @@ def main():
 
 if __name__ == "__main__":
     config = configobj.ConfigObj("config.ini")
-    main()
+    valid = ["city", "movie_name", "language", "month", "day",
+             "access_token", "device_nickname"]
+    filter_config = dict((k, v) for k, v in config.items() if v and k in valid)
+
+    if len(filter_config) != len(valid):
+        print("Missing data in config file!")
+    else:
+        main()
