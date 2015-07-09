@@ -24,7 +24,7 @@ def showtimes(url):
     res = requests.get(config["base_URL"] + url + "?did=" + date,
                        headers={"User-Agent": config["user_agent"]}
                        )
-    soup = BeautifulSoup(res.content)
+    soup = BeautifulSoup(res.content, "html.parser")
     tag = soup.find_all(attrs={"class": "noRec"})
 
     movie = ""
@@ -50,7 +50,7 @@ def main():
     res = requests.get(config["base_URL"] + config["city"] +
                        "/cinemas", headers={"User-Agent": config["user_agent"]}
                        )
-    soup = BeautifulSoup(res.content)
+    soup = BeautifulSoup(res.content, "html.parser")
     tag = soup.find_all("div", attrs={"class": "cinlst"})
 
     movie_url = []
