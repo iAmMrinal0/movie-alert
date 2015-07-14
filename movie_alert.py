@@ -45,7 +45,7 @@ def showtimes(url):
     if show_times != "":
         # remove unwanted content from cinema hall title
         cinema_hall = soup.title.string[:-55]
-        return [cinema_hall, movie, show_times]
+        return [movie, cinema_hall, show_times]
 
 
 def main():
@@ -68,13 +68,15 @@ def main():
                 movie_url.append(a_href['href'])
 
             final_showtimes = ""
+            movie_full_title = ""
             # get the showtimes for the movie in the cinema hall from url's
             # scraped
             for url in movie_url:
                 details = showtimes(url)
                 if details is not None:
-                    final_showtimes += "{0}\n".format(details[0])
-                    final_showtimes += "    {0}\n".format(details[1])
+                    if not movie_full_title:
+                        movie_full_title = "{0}".format(details[0])
+                    final_showtimes += "{0}\n".format(details[1])
                     final_showtimes += "    {0}\n".format(details[2])
 
             final_showtimes = final_showtimes.strip()
@@ -89,9 +91,8 @@ def main():
                         break
 
                 if iden:
-                    p.pushNote(iden, config["movie_name"].title(),
-                               final_showtimes)
-                print(final_showtimes)
+                    p.pushNote(iden, movie_full_title, final_showtimes)
+                print(movie_full_title + "\n" + final_showtimes)
             else:
                 print("No showtimes found!")
         else:
