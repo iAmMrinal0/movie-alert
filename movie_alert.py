@@ -50,56 +50,67 @@ def showtimes(url):
 
 def main():
 
-    # send a request to http://bookmyshow.com/city/cinemas to get all
-    # cinema halls in the city
-    res = requests.get(config["base_URL"] + config["city"] +
-                       "/cinemas", headers={"User-Agent": config["user_agent"]}
-                       )
-    soup = BeautifulSoup(res.content, "html.parser")
-    tag = soup.find_all("div", attrs={"class": "cinlst"})
+    # check if config file has all data that is required
+    check_data = check_config()
+    if check_data:
+        # send a request to http://bookmyshow.com/city/cinemas to get all
+        # cinema halls in the city
+        res = requests.get(config["base_URL"] + config["city"] + "/cinemas",
+                           headers={"User-Agent": config["user_agent"]}
+                           )
+        soup = BeautifulSoup(res.content, "html.parser")
+        tag = soup.find_all("div", attrs={"class": "cinlst"})
 
-    movie_url = []
-    # scrap all cinema hall url's in the city
-    if tag:
-        for a_href in tag[0].find_all("a"):
-            movie_url.append(a_href['href'])
+        movie_url = []
+        # scrap all cinema hall url's in the city
+        if tag:
+            for a_href in tag[0].find_all("a"):
+                movie_url.append(a_href['href'])
 
-        final_showtimes = ""
-        # get the showtimes for the movie in the cinema hall from url's scraped
-        for url in movie_url:
-            details = showtimes(url)
-            if details is not None:
-                final_showtimes += "{0}\n".format(details[0])
-                final_showtimes += "    {0}\n".format(details[1])
-                final_showtimes += "    {0}\n".format(details[2])
+            final_showtimes = ""
+            # get the showtimes for the movie in the cinema hall from url's
+            # scraped
+            for url in movie_url:
+                details = showtimes(url)
+                if details is not None:
+                    final_showtimes += "{0}\n".format(details[0])
+                    final_showtimes += "    {0}\n".format(details[1])
+                    final_showtimes += "    {0}\n".format(details[2])
 
-        final_showtimes = final_showtimes.strip()
-        if final_showtimes:
-            p = PushBullet(config["access_token"])
-            devices = p.getDevices()
-            iden = ""
-            for dev in devices:
-                if ("nickname" in dev.keys() and
-                        dev["nickname"] == config["device_nickname"]):
-                    iden = dev["iden"]
-                    break
+            final_showtimes = final_showtimes.strip()
+            if final_showtimes:
+                p = PushBullet(config["access_token"])
+                devices = p.getDevices()
+                iden = ""
+                for dev in devices:
+                    if ("nickname" in dev.keys() and
+                            dev["nickname"] == config["device_nickname"]):
+                        iden = dev["iden"]
+                        break
 
-            if iden:
-                p.pushNote(iden, config["movie_name"].title(), final_showtimes)
-            print(final_showtimes)
+                if iden:
+                    p.pushNote(iden, config["movie_name"].title(),
+                               final_showtimes)
+                print(final_showtimes)
+            else:
+                print("No showtimes found!")
         else:
-            print("No showtimes found!")
+            print("Incorrect city detected! Change the city value in config "
+                  "file!")
     else:
-        print("Incorrect city detected! Change the city value in config file!")
+        print("Missing data in config file!")
 
-if __name__ == "__main__":
-    config = configobj.ConfigObj("config.ini")
+
+def check_config():
     valid = ["city", "movie_name", "language", "month", "day",
              "access_token", "device_nickname"]
     # filter empty config values and end program if any value is empty
     filter_config = dict((k, v) for k, v in config.items() if v and k in valid)
-
     if len(filter_config) != len(valid):
-        print("Missing data in config file!")
+        return False
     else:
-        main()
+        return True
+
+if __name__ == "__main__":
+    config = configobj.ConfigObj("config.ini")
+    main()
