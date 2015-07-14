@@ -17,6 +17,7 @@ import requests
 from PushBullet import PushBullet
 
 
+# validate the PushBullet access token and if valid return device nicknames
 def validate(token):
     try:
         p = PushBullet(token)
@@ -60,6 +61,7 @@ def main():
                 if len(check_nick) > 1:
                     nickname_list = check_nick[1:]
 
+    # use nickname_list to get name of device to send notification to
     if not config["device_nickname"] and nickname_list:
         for i in range(0, len(nickname_list)):
             print("{0}. {1}".format(i + 1, nickname_list[i]))
@@ -70,7 +72,7 @@ def main():
                 config["device_nickname"] = nickname_list[
                     int(nickname) - 1]
                 break
-    config.write()
+    config.write()  # save all config values in config.ini
 
     print("'{0}' on {1}-{2}-{3} will be tracked and will be sent to '{4}'".
           format(config["movie_name"], config["day"], config["month"],

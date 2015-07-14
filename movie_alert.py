@@ -21,6 +21,7 @@ from PushBullet import PushBullet
 def showtimes(url):
     date = config["year"] + config["month"] + config["day"]
 
+    # send a request to the cinema hall url in the city scraped in main()
     res = requests.get(config["base_URL"] + url + "?did=" + date,
                        headers={"User-Agent": config["user_agent"]}
                        )
@@ -30,6 +31,7 @@ def showtimes(url):
     movie = ""
     show_times = ""
 
+    # scrap and match movie name and language then get the showtimes
     for t in tag[0].find_all("div", attrs={"class": "fleft cmain"}):
         for z in t.find_all("span", attrs={"class": "mname"}):
             if config["movie_name"].lower() in z.string.lower():
@@ -41,12 +43,15 @@ def showtimes(url):
                         show_times += "{0} ".format(k.string)
 
     if show_times != "":
+        # remove unwanted content from cinema hall title
         cinema_hall = soup.title.string[:-55]
         return [cinema_hall, movie, show_times]
 
 
 def main():
 
+    # send a request to http://bookmyshow.com/city/cinemas to get all
+    # cinema halls in the city
     res = requests.get(config["base_URL"] + config["city"] +
                        "/cinemas", headers={"User-Agent": config["user_agent"]}
                        )
@@ -54,11 +59,13 @@ def main():
     tag = soup.find_all("div", attrs={"class": "cinlst"})
 
     movie_url = []
+    # scrap all cinema hall url's in the city
     if tag:
         for a_href in tag[0].find_all("a"):
             movie_url.append(a_href['href'])
 
         final_showtimes = ""
+        # get the showtimes for the movie in the cinema hall from url's scraped
         for url in movie_url:
             details = showtimes(url)
             if details is not None:
@@ -89,6 +96,7 @@ if __name__ == "__main__":
     config = configobj.ConfigObj("config.ini")
     valid = ["city", "movie_name", "language", "month", "day",
              "access_token", "device_nickname"]
+    # filter empty config values and end program if any value is empty
     filter_config = dict((k, v) for k, v in config.items() if v and k in valid)
 
     if len(filter_config) != len(valid):
