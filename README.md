@@ -24,5 +24,8 @@ Now run `python movie_alert.py` and if a movie is playing on the date and in the
 2. Manage for task scheduling so it checks every x minutes till movie is found.
 3. Handle exceptions during initial setup.
 
+## Acknowledgements
+`PushBullet.py` by @azelphur - GitHub repo [link](https://github.com/Azelphur/pyPushBullet)
+
 ### License
  See the [LICENSE](LICENSE.md) file for license rights and limitations (GNU GPL v3)
