@@ -42,7 +42,7 @@ def showtimes(url):
                     for k in g:
                         show_times += "{0} ".format(k.string)
 
-    if show_times != "":
+    if show_times:
         # remove unwanted content from cinema hall title
         cinema_hall = soup.title.string[:-55]
         return [movie, cinema_hall, show_times]
