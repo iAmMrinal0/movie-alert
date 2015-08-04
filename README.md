@@ -2,7 +2,7 @@
 A script written in Python to send a PushBullet notification when a particular movie hits the movie hall in your city which is listed on Bookmyshow.
 
 ## Requirements
-1. Install [Python 3.4](https://www.python.org/download/releases/3.4.3/)  
+1. Install [Python 3.3 or 3.4](https://www.python.org/downloads/)  
 2. Install requests, beautifulsoup4, websocket-client, configobj using separate pip commands or use `pip install -r requirements.txt` to install all required packages in one go.
 
   - requests - `pip install requests`
