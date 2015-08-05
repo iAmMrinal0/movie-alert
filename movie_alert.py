@@ -48,6 +48,21 @@ def showtimes(url):
         return [movie, cinema_hall, show_times]
 
 
+def push_it(pushbullet_obj, device_id, movie_title, movie_showtimes):
+    pushbullet_obj.pushNote(device_id, movie_title, movie_showtimes)
+
+
+def check_config():
+    valid = ["city", "movie_name", "language", "month", "day",
+             "access_token", "device_nickname"]
+    # filter empty config values and end program if any value is empty
+    filter_config = dict((k, v) for k, v in config.items() if v and k in valid)
+    if len(filter_config) != len(valid):
+        return False
+    else:
+        return True
+
+
 def main():
 
     # check if config file has all data that is required
@@ -91,7 +106,7 @@ def main():
                         break
 
                 if iden:
-                    p.pushNote(iden, movie_full_title, final_showtimes)
+                    push_it(p, iden, movie_full_title, final_showtimes)
                 print(movie_full_title + "\n" + final_showtimes)
             else:
                 print("No showtimes found!")
@@ -101,16 +116,6 @@ def main():
     else:
         print("Missing data in config file!")
 
-
-def check_config():
-    valid = ["city", "movie_name", "language", "month", "day",
-             "access_token", "device_nickname"]
-    # filter empty config values and end program if any value is empty
-    filter_config = dict((k, v) for k, v in config.items() if v and k in valid)
-    if len(filter_config) != len(valid):
-        return False
-    else:
-        return True
 
 if __name__ == "__main__":
     config = configobj.ConfigObj("config.ini")
