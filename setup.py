@@ -29,6 +29,8 @@ def validate(token):
         return nick
     except requests.exceptions.HTTPError:
         return [True]
+    except requests.exceptions.ConnectionError:
+        return ["conn_err"]
 
 
 def main():
@@ -50,16 +52,20 @@ def main():
         config["month"] = month
 
     nickname_list = []
+    conn_err = False
     if not config["access_token"]:
         check = True
         while(check):
             access_token = input("Enter access token: ")
             check_nick = validate(access_token)
             check = check_nick[0]
-            if not check:
+            if not check and not check == "conn_err":
                 config["access_token"] = access_token
                 if len(check_nick) > 1:
                     nickname_list = check_nick[1:]
+            if check == "conn_err":
+                conn_err = True
+                break
 
     # use nickname_list to get name of device to send notification to
     if not config["device_nickname"] and nickname_list:
@@ -73,11 +79,13 @@ def main():
                     int(nickname) - 1]
                 break
     config.write()  # save all config values in config.ini
-
-    print("'{0}' on {1}-{2}-{3} will be tracked and will be sent to '{4}'".
-          format(config["movie_name"], config["day"], config["month"],
-                 config["year"], config["device_nickname"])
-          )
+    if not conn_err:
+        print("'{0}' on {1}-{2}-{3} will be tracked and will be sent to '{4}'".
+              format(config["movie_name"], config["day"], config["month"],
+                     config["year"], config["device_nickname"])
+              )
+    else:
+        print("Connection error!")
 
 if __name__ == "__main__":
     config = configobj.ConfigObj("config.ini")
