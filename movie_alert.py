@@ -21,13 +21,7 @@ from PushBullet import PushBullet
 def showtimes(url):
     date = config["year"] + config["month"] + config["day"]
 
-    # send a request to the cinema hall url in the city scraped in main()
-    res = requests.get(config["base_URL"] + url + "?did=" + date,
-                       headers={"User-Agent": config["user_agent"]}
-                       )
-    soup = BeautifulSoup(res.content, "html.parser")
-    tag = soup.find_all(attrs={"class": "noRec"})
-
+    tag, title = get_showtimes(url, date)
     movie = ""
     show_times = ""
 
@@ -44,8 +38,18 @@ def showtimes(url):
 
     if show_times:
         # remove unwanted content from cinema hall title
-        cinema_hall = soup.title.string[:-55]
+        cinema_hall = title
         return [movie, cinema_hall, show_times]
+
+
+def get_showtimes(url, date):
+    # send a request to the cinema hall url in the city scraped in main()
+    res = requests.get(config["base_URL"] + url + "?did=" + date,
+                       headers={"User-Agent": config["user_agent"]}
+                       )
+    soup = BeautifulSoup(res.content, "html.parser")
+    tag = soup.find_all(attrs={"class": "noRec"})
+    return [tag, soup.title.string[:-55]]
 
 
 def push_it(pushbullet_obj, device_id, movie_title, movie_showtimes):
@@ -63,19 +67,35 @@ def check_config():
         return True
 
 
+def pushbullet_magic():
+    p = PushBullet(config["access_token"])
+    devices = p.getDevices()
+    iden = ""
+    for dev in devices:
+        if ("nickname" in dev.keys() and
+                dev["nickname"] == config["device_nickname"]):
+            iden = dev["iden"]
+            break
+    return [p, iden]
+
+
+def get_cinema_halls():
+    # send a request to http://bookmyshow.com/city/cinemas to get all
+    # cinema halls in the city
+    res = requests.get(config["base_URL"] + config["city"] + "/cinemas",
+                       headers={"User-Agent": config["user_agent"]}
+                       )
+    soup = BeautifulSoup(res.content, "html.parser")
+    tag = soup.find_all("div", attrs={"class": "cinlst"})
+    return tag
+
+
 def main():
 
     # check if config file has all data that is required
     check_data = check_config()
     if check_data:
-        # send a request to http://bookmyshow.com/city/cinemas to get all
-        # cinema halls in the city
-        res = requests.get(config["base_URL"] + config["city"] + "/cinemas",
-                           headers={"User-Agent": config["user_agent"]}
-                           )
-        soup = BeautifulSoup(res.content, "html.parser")
-        tag = soup.find_all("div", attrs={"class": "cinlst"})
-
+        tag = get_cinema_halls()
         movie_url = []
         # scrap all cinema hall url's in the city
         if tag:
@@ -96,15 +116,7 @@ def main():
 
             final_showtimes = final_showtimes.strip()
             if final_showtimes:
-                p = PushBullet(config["access_token"])
-                devices = p.getDevices()
-                iden = ""
-                for dev in devices:
-                    if ("nickname" in dev.keys() and
-                            dev["nickname"] == config["device_nickname"]):
-                        iden = dev["iden"]
-                        break
-
+                p, iden = pushbullet_magic()
                 if iden:
                     push_it(p, iden, movie_full_title, final_showtimes)
                 print(movie_full_title + "\n" + final_showtimes)
