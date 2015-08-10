@@ -82,12 +82,15 @@ def pushbullet_magic():
 def get_cinema_halls():
     # send a request to http://bookmyshow.com/city/cinemas to get all
     # cinema halls in the city
-    res = requests.get(config["base_URL"] + config["city"] + "/cinemas",
-                       headers={"User-Agent": config["user_agent"]}
-                       )
-    soup = BeautifulSoup(res.content, "html.parser")
-    tag = soup.find_all("div", attrs={"class": "cinlst"})
-    return tag
+    try:
+        res = requests.get(config["base_URL"] + config["city"] + "/cinemas",
+                           headers={"User-Agent": config["user_agent"]}
+                           )
+        soup = BeautifulSoup(res.content, "html.parser")
+        tag = soup.find_all("div", attrs={"class": "cinlst"})
+        return tag
+    except requests.exceptions.ConnectionError:
+        return False
 
 
 def main():
@@ -122,6 +125,8 @@ def main():
                 print(movie_full_title + "\n" + final_showtimes)
             else:
                 print("No showtimes found!")
+        elif tag is False:
+            print("Connection Error!")
         else:
             print("Incorrect city detected! Change the city value in config "
                   "file!")
