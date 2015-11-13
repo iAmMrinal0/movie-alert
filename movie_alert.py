@@ -89,7 +89,7 @@ def get_cinema_halls():
         soup = BeautifulSoup(res.content, "html.parser")
         tag = soup.find_all("div", attrs={"class": "cinlst"})
         return tag
-    except requests.exceptions.ConnectionError:
+    except requests.ConnectionError:
         return False
 
 

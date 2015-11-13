@@ -27,9 +27,9 @@ def validate(token):
             if "nickname" in dev.keys():
                 nick.append(dev["nickname"])
         return nick
-    except requests.exceptions.HTTPError:
+    except requests.HTTPError:
         return [True]
-    except requests.exceptions.ConnectionError:
+    except requests.ConnectionError:
         return ["conn_err"]
 
 
