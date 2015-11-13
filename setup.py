@@ -55,7 +55,7 @@ def main():
     conn_err = False
     if not config["access_token"]:
         check = True
-        while(check):
+        while check:
             access_token = input("Enter access token: ")
             check_nick = validate(access_token)
             check = check_nick[0]
@@ -71,7 +71,7 @@ def main():
     if not config["device_nickname"] and nickname_list:
         for i in range(0, len(nickname_list)):
             print("{0}. {1}".format(i + 1, nickname_list[i]))
-        while(True):
+        while True:
             nickname = input("Which device(1,{0}) would you like the "
                              "notification sent to?".format(i + 1))
             if int(nickname) in range(1, i + 2):
