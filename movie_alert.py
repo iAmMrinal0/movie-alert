@@ -30,7 +30,7 @@ def get_movie_url():
             c = tag.find_all("a")
             h = tag.find_all("h2")
             if (config['language'].lower() == h[0].text.lower() and
-                    config["movie_name"].lower() in c[0]["href"]):
+                    config["movie_name"].lower().replace(" ", "-") in c[0]["href"]):
                 return c[0]['href'][1:-9]
     except requests.ConnectionError:
         return False
@@ -45,19 +45,25 @@ def get_show_times(url):
                            headers={"User-Agent": config["user_agent"]})
         source = BeautifulSoup(req.content, "html.parser")
         m_name = source.find("h1", attrs={"itemprop": "name"})
-        movie_name= m_name["content"]
-        cinema_halls = source.find_all("div", attrs={"class": "container"})
-        result = dict()
-        for cin in cinema_halls:
-            halls = cin.find_all("li", attrs={"class": "list"})
-            for temp in halls:
-                if temp["data-is-down"] == "false":
-                    times = temp.find_all("div", attrs={"data-online": "Y"})
-                    if times:
-                        result.setdefault(temp["data-name"], [])
-                        for im in times:
-                            result[temp["data-name"]].append(im.text.strip())
-        return [movie_name, result]
+        if m_name:
+            movie_name = m_name["content"]
+            cinema_halls = source.find_all("div", attrs={"class": "container"})
+            result = dict()
+            for cin in cinema_halls:
+                halls = cin.find_all("li", attrs={"class": "list"})
+                for temp in halls:
+                    if temp["data-is-down"] == "false":
+                        times = temp.find_all("div",
+                                              attrs={"data-online": "Y"})
+                        if times:
+                            result.setdefault(temp["data-name"], [])
+                            for im in times:
+                                result[temp["data-name"]].append(
+                                    im.text.strip()
+                                )
+            return [movie_name, result]
+        else:
+            return False
     except requests.ConnectionError:
         return False
 
@@ -73,7 +79,13 @@ def push_it(data):
             iden = dev["iden"]
             break
     if iden:
-        p.pushNote(iden, movie_name, show_times)
+        try:
+            p.pushNote(iden, movie_name, show_times)
+            return [True, movie_name, show_times]
+        except requests.ConnectionError:
+            return False
+    else:
+        return None
 
 
 def data_to_string(data):
@@ -87,7 +99,14 @@ def data_to_string(data):
 def main():
     url = get_movie_url()
     result = get_show_times(url)
-    push_it(result)
+    if result:
+        pushed = push_it(result)
+        if pushed[0] is None:
+            print("No matching devices found!")
+        elif pushed[0]:
+            print("{0}\n{1}".format(pushed[1], pushed[2]))
+        else:
+            print("Connection error!")
 
 
 if __name__ == "__main__":
