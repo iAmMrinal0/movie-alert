@@ -91,17 +91,31 @@ def data_to_string(data):
     return result
 
 
+def check_config():
+    valid = ["city", "movie_name", "language", "month", "day",
+             "access_token", "device_iden", "device_nickname"]
+    # filter empty config values and end program if any value is empty
+    filter_config = dict((k, v) for k, v in config.items() if v and k in valid)
+    if len(filter_config) != len(valid):
+        return False
+    else:
+        return True
+
+
 def main():
-    url = get_movie_url()
-    result = get_show_times(url)
-    if result:
-        pushed = push_it(result)
-        if pushed[0] is None:
-            print("No matching devices found!")
-        elif pushed[0]:
-            print("{0}\n{1}".format(pushed[1], pushed[2]))
-        else:
-            print("Connection error!")
+    if check_config():
+        url = get_movie_url()
+        result = get_show_times(url)
+        if result:
+            pushed = push_it(result)
+            if pushed[0] is None:
+                print("No matching devices found!")
+            elif pushed[0]:
+                print("{0}\n{1}".format(pushed[1], pushed[2]))
+            else:
+                print("Connection error!")
+    else:
+        print("Check config.ini for incorrect/missing values!")
 
 
 if __name__ == "__main__":
