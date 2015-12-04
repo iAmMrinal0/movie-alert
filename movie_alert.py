@@ -73,11 +73,7 @@ def push_it(data):
     iden = ""
     movie_name = data[0]
     show_times = data_to_string(data[1])
-    for dev in devices:
-        if ("nickname" in dev.keys() and
-                dev["nickname"] == config["device_nickname"]):
-            iden = dev["iden"]
-            break
+    iden = config["device_iden"]
     if iden:
         try:
             p.pushNote(iden, movie_name, show_times)

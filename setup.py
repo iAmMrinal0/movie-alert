@@ -33,6 +33,20 @@ def validate(token):
         return ["conn_err"]
 
 
+def get_iden(token, device):
+    try:
+        p = PushBullet(token)
+        devices = p.getDevices()
+        for dev in devices:
+            if ("nickname" in dev.keys() and
+                    dev["nickname"] == device):
+                iden = dev["iden"]
+                break
+        return iden
+    except requests.ConnectionError:
+        return False
+
+
 def main():
     if not config["city"]:
         city = input("Which city to track the movie in?")
@@ -68,15 +82,16 @@ def main():
                 break
 
     # use nickname_list to get name of device to send notification to
-    if not config["device_nickname"] and nickname_list:
+    if not config["device_iden"] and nickname_list:
         for i in range(0, len(nickname_list)):
             print("{0}. {1}".format(i + 1, nickname_list[i]))
         while True:
             nickname = input("Which device(1,{0}) would you like the "
                              "notification sent to?".format(i + 1))
             if int(nickname) in range(1, i + 2):
-                config["device_nickname"] = nickname_list[
-                    int(nickname) - 1]
+                iden = get_iden(access_token, nickname_list[int(nickname) - 1])
+                config["device_nickname"] = nickname_list[int(nickname) - 1]
+                config["device_iden"] = iden
                 break
     config.write()  # save all config values in config.ini
     if not conn_err:
