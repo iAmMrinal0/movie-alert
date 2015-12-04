@@ -29,8 +29,9 @@ def get_movie_url():
         for tag in tags:
             c = tag.find_all("a")
             h = tag.find_all("h2")
+            m_name = config["movie_name"].lower().replace(" ", "-")
             if (config['language'].lower() == h[0].text.lower() and
-                    config["movie_name"].lower().replace(" ", "-") in c[0]["href"]):
+                    m_name in c[0]["href"]):
                 return c[0]['href'][1:-9]
     except requests.ConnectionError:
         return False
@@ -69,8 +70,6 @@ def get_show_times(url):
 
 
 def push_it(data):
-    devices = p.getDevices()
-    iden = ""
     movie_name = data[0]
     show_times = data_to_string(data[1])
     iden = config["device_iden"]
