@@ -19,6 +19,7 @@ from PushBullet import PushBullet
 
 
 def get_movie_url():
+    # request in.bookmyshow.com/{city_name}/movies to get URL of required movie
     url = config["base_URL"] + config["city"] + "/movies"
     try:
         req = requests.get(url, headers={"User-Agent": config["user_agent"]})
@@ -38,6 +39,7 @@ def get_movie_url():
 
 
 def get_show_times(url):
+    # get show times based on previous URL with the year+month+day concatenated
     show_url = "{0}{1}{2}{3}{4}".format(config["base_URL"], url,
                                         config["year"], config["month"],
                                         config["day"])
@@ -70,6 +72,8 @@ def get_show_times(url):
 
 
 def push_it(data):
+    # push the movie name and cinema hall with movie timings to selected
+    # pushbullet device
     movie_name = data[0]
     show_times = data_to_string(data[1])
     iden = config["device_iden"]
@@ -84,6 +88,7 @@ def push_it(data):
 
 
 def data_to_string(data):
+    # cinema halls and show times is a dictionary with list values
     result = ""
     for key, value in data.items():
         times = " ".join(value)
@@ -92,6 +97,7 @@ def data_to_string(data):
 
 
 def check_config():
+    # check if none of the values in config.ini are empty
     valid = ["city", "movie_name", "language", "month", "day",
              "access_token", "device_iden", "device_nickname"]
     # filter empty config values and end program if any value is empty
