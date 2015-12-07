@@ -82,9 +82,9 @@ def push_it(data):
             p.pushNote(iden, movie_name, show_times)
             return [True, movie_name, show_times]
         except requests.ConnectionError:
-            return False
+            return [False]
     else:
-        return None
+        return [None]
 
 
 def data_to_string(data):
