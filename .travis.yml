@@ -1,8 +1,16 @@
 language: python
+
 python:
   - "3.3"
   - "3.4"
+
 # command to install dependencies
 install: "pip install -r requirements.txt"
+
 # command to run tests
 script: nosetests
+
+after_success:
+  - pip install pep8 pyflakes
+  - pep8 movie_alert.py
+  - pyflakes movie_alert.py
