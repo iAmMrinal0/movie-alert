@@ -1,5 +1,5 @@
 # Movie Alert
-A script written in Python to send a PushBullet notification when a particular movie hits the movie hall in your city which is listed on Bookmyshow.
+A script written in Python to send a PushBullet notification when a particular movie hits the movie hall in your city which is listed on Bookmyshow. For a web-based approach, please look into [django_moviealert](https://github.com/iammrinal0/django_moviealert)
 
 ## Requirements
 1. Install [Python 3.3 or 3.4](https://www.python.org/downloads/)  
